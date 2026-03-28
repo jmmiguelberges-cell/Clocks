@@ -301,7 +301,15 @@ useEffect(() => {
   }
 
   const pop = svcs.filter(s => s.category === 'popular'), oth = svcs.filter(s => s.category !== 'popular'), days = gMD(cY, cM), can = [!!svc, !!sty, !!(date && time)][step]
-
+  {sty && <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+  <span style={{ fontSize: 12, color: 'var(--text3)' }}>Disponibilidad:</span>
+  {[['var(--green)', '+10'], ['var(--yellow)', '6-10'], ['var(--orange)', '1-5']].map(([c, l]) =>
+    <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <div style={{ width: 8, height: 4, borderRadius: 2, background: c }} />
+      <span style={{ fontSize: 11, color: 'var(--text3)' }}>{l}</span>
+    </div>
+  )}
+</div>}
   return <div style={{ paddingBottom: 110 }}>
     <div style={{ padding: '8px 20px 0' }}><BB onClick={step > 0 ? () => { setStep(step - 1); if (step === 2) setTime(null) } : onBack} /></div>
     <div style={{ display: 'flex', gap: 6, padding: '4px 20px 18px' }}>{['Servicio', 'Profesional', 'Fecha y hora'].map((l, i) => <div key={i} style={{ flex: 1 }}><div style={{ height: 3, borderRadius: 2, background: i <= step ? 'var(--teal)' : 'var(--border)', transition: 'all .4s', marginBottom: 6 }} /><span style={{ fontSize: 10, fontWeight: i <= step ? 700 : 400, color: i <= step ? 'var(--teal)' : 'var(--text3)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{l}</span></div>)}</div>
