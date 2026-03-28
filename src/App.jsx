@@ -338,7 +338,8 @@ useEffect(() => {
         {days.map((d, i) => {
           if (!d) return <div key={'e' + i} />
           const pa = isP(d), su = d.getDay() === 0, di = pa || su, sl = date && toK(date) === toK(d)
-          return <button key={toK(d)} onClick={di ? undefined : () => { setDate(d); setTime(null) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 42, borderRadius: 21, background: 'transparent', border: sl ? '2px solid var(--teal)' : '2px solid transparent', cursor: di ? 'default' : 'pointer', opacity: di ? 0.25 : 1 }}><span style={{ fontSize: 13, fontWeight: isT(d) ? 700 : 400, color: sl ? 'var(--teal)' : 'var(--text)' }}>{d.getDate()}</span></button>
+          return <button key={toK(d)} onClick={di ? undefined : () => { setDate(d); setTime(null) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 42, borderRadius: 21, background: 'transparent', border: sl ? '2px solid var(--teal)' : '2px solid transparent', cursor: di ? 'default' : 'pointer', opacity: di ? 0.25 : 1 }}><span style={{ fontSize: 13, fontWeight: isT(d) ? 700 : 400, color: sl ? 'var(--teal)' : 'var(--text)' }}>{d.getDate()}</span>
+{!di && monthAvail[toK(d)] && monthAvail[toK(d)] !== 'none' && <div style={{ width: 6, height: 6, borderRadius: 3, marginTop: 1, background: monthAvail[toK(d)] === 'green' ? 'var(--green)' : monthAvail[toK(d)] === 'yellow' ? 'var(--yellow)' : 'var(--orange)' }} />}</button>
         })}
       </div>
       {date && <div className="anim" style={{ marginTop: 20 }}>
