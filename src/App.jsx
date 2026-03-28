@@ -242,7 +242,40 @@ function SvcRow({ s, sel, onClick, i }) {
 
 function Booking({ user, profile, svcs, stys, pre, onDone, onBack }) {
   const [step, setStep] = useState(pre ? 1 : 0), [svc, setSvc] = useState(pre), [sty, setSty] = useState(null), [date, setDate] = useState(null), [time, setTime] = useState(null), [note, setNote] = useState(''), [cM, setCM] = useState(new Date().getMonth()), [cY, setCY] = useState(new Date().getFullYear()), [slots, setSlots] = useState([]), [sL, setSL] = useState(false), [bk, setBk] = useState(false)
+  const [monthAvail, setMonthAvail] = useState({})
 
+useEffect(() => {
+  if (!sty) return
+  ;(async () => {
+    const startDate = `${cY}-${String(cM+1).padStart(2,'0')}-01`
+    const endDate = `${cM === 11 ? cY+1 : cY}-${String(cM === 11 ? 1 : cM+2).padStart(2,'0')}-01`
+    const [{data: bd}, {data: bl}] = await Promise.all([
+      supabase.from('appointments').select('appointment_date,appointment_time,end_time').eq('stylist_id',sty.id).gte('appointment_date',startDate).lt('appointment_date',endDate).eq('status','confirmed'),
+      supabase.from('blocked_slots').select('blocked_date,start_time,end_time').eq('stylist_id',sty.id).gte('blocked_date',startDate).lt('blocked_date',endDate),
+    ])
+    const avail = {}
+    const daysInMonth = new Date(cY, cM+1, 0).getDate()
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = new Date(cY, cM, i)
+      if (d.getDay() === 0) continue
+      const dk = toK(d)
+      const cl = d.getDay() === 6 ? '14:00' : '20:00'
+      const totalSlots = gS('09:00', cl).length
+      const tk = new Set()
+      ;(bd||[]).filter(a => a.appointment_date === dk).forEach(a => {
+        let c = a.appointment_time.slice(0,5); const e = a.end_time.slice(0,5)
+        while(c<e){tk.add(c);c=aM(c,30)}
+      })
+      ;(bl||[]).filter(b => b.blocked_date === dk).forEach(b => {
+        let c = b.start_time.slice(0,5); const e = b.end_time.slice(0,5)
+        while(c<e){tk.add(c);c=aM(c,30)}
+      })
+      const free = totalSlots - tk.size
+      avail[dk] = free > 10 ? 'green' : free > 5 ? 'yellow' : free > 0 ? 'orange' : 'none'
+    }
+    setMonthAvail(avail)
+  })()
+}, [cM, cY, sty])
   useEffect(() => { if (profile?.favorite_stylist_id && stys.length) { const f = stys.find(s => s.id === profile.favorite_stylist_id); if (f) setSty(f) } }, [profile, stys])
 
   useEffect(() => {
